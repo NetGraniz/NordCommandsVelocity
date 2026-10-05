@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 @Plugin(
         id = "nordcommands",
         name = "NordCommands",
-        version = "1.1.0",
+        version = "1.1.1",
         description = "Bounded Velocity command filter for Nord Fjell",
         authors = {"Nord Fjell"}
 )

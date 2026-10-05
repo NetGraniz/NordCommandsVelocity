@@ -1,5 +1,8 @@
 # NordCommands Velocity 1.1.0
 
+> Release build and installation requirements: see [BUILDING.md](BUILDING.md).
+> Older local paths below describe historical test fixtures, not the release build.
+
 Denies proxy-owned commands for players without `nordcommands.bypass`, checking
 both the original root and the effective `CommandResult` replacement at early
 and final Velocity priorities. No underlying target-command permissions are

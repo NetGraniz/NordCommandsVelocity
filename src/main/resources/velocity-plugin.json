@@ -1,1 +1,1 @@
-{"id":"nordcommands","name":"NordCommands","version":"1.1.0","description":"Bounded Velocity command filter for Nord Fjell","authors":["Nord Fjell"],"main":"com.nordfjell.nordcommandsvelocity.NordCommandsVelocityPlugin"}
+{"id":"nordcommands","name":"NordCommands","version":"${project.version}","description":"Bounded Velocity command filter for Nord Fjell","authors":["Nord Fjell"],"main":"com.nordfjell.nordcommandsvelocity.NordCommandsVelocityPlugin"}
