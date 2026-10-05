@@ -1,0 +1,1 @@
+{"id":"velocitycommandstestprobe","name":"VelocityCommandsTestProbe","version":"1.0.0","main":"com.nordfjell.nordcommandsvelocity.test.VelocityCommandsTestProbe","dependencies":[{"id":"nordcommands","optional":false}]}
