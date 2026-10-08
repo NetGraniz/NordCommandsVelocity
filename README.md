@@ -1,38 +1,39 @@
-# NordCommands Velocity 1.1.0
+# NordCommandsVelocity
 
-> Release build and installation requirements: see [BUILDING.md](BUILDING.md).
-> Older local paths below describe historical test fixtures, not the release build.
+Filters proxy-owned commands on Velocity. Backend command text and forwarding results pass through unchanged; the proxy console is not filtered.
 
-Denies proxy-owned commands for players without `nordcommands.bypass`, checking
-both the original root and the effective `CommandResult` replacement at early
-and final Velocity priorities. No underlying target-command permissions are
-granted. Backend command strings/results are not rebuilt; console is untouched.
+## Policy
 
-Fast event handlers use `async=false` so this plugin does not itself force an
-extra asynchronous event dispatch. Other handlers and Velocity command execution
-can still be asynchronous. No per-command scheduled tasks, file I/O, extra worker
-threads or persistent player database are introduced.
+Players without `nordcommands.bypass` cannot execute proxy-owned commands. The listener checks both the original root and any effective `CommandResult` replacement at early and final event stages.
 
-Denial messages are limited to one per 250 ms per session, with a 4096-entry
-identity-keyed cap and disconnect/shutdown cleanup. Full notice capacity suppresses
-messages, never command denial. Inputs exceeding 32767 UTF-16 code units or
-256-code-unit roots, slash-prefixed API inputs, controls and Unicode line separators
-are rejected for ordinary players. Velocity event strings omit the first slash;
-leading spaces, case and registered namespaced roots are recognized.
+Handlers use `async=false`: NordCommands does not force asynchronous event dispatch. Other handlers and Velocity's execution path can still run asynchronously. The plugin creates no per-command task, file I/O, extra worker or persistent player database.
 
-Available-command roots are hidden for modern clients. This is presentation, not
-an authorization barrier for suggestions: a manually sent modern completion request
-or trusted plugin calling `offerSuggestions` may still obtain a proxy command's
-suggestions. Target commands must enforce their own `hasPermission`/`requires`
-checks, including their suggestion providers. This filter does not modify Velocity
-internals or wrap other plugins' command registrations. Its declared guarantee is
-execution filtering and modern root-list hiding, not total suggestion secrecy.
+Denied-command notices are limited to one per 250 ms per session. The identity-keyed limiter holds at most 4096 sessions and cleans up on disconnect and shutdown. Overflow suppresses the notice, not the denial.
 
-Trusted plugins at the same final priority can override results afterward, and
-`executeImmediatelyAsync`/direct executors bypass `CommandExecuteEvent`. No plugin
-event listener is an isolation boundary against other installed trusted code.
+## Permissions
 
-Build and checks: run build.ps1 against isolated LOCAL Velocity libraries.
-Network harness: test-support/integration.cjs; probes are fixture-only and must
-never be installed on production. See SECURITY-1.1.0.md for evidence and limits.
-Production installation requires separately approved proxy downtime and backup.
+| Permission | Allows |
+| --- | --- |
+| `nordcommands.bypass` | Execute proxy-owned commands through this filter |
+
+Velocity's permission provider decides player access; this plugin registers no default player grant. A Paper/Folia permission assignment does not grant this proxy permission.
+
+Bypass does not grant the target command's own permission. Its handler must still check access.
+
+## Input and visibility
+
+Ordinary players cannot submit command text over 32767 UTF-16 code units or a root over 256 code units. Slash-prefixed API input, controls and Unicode line separators are rejected. Velocity events normally omit the leading slash.
+
+Root recognition handles leading spaces, case differences and registered namespaced roots. Modern command trees hide blocked proxy roots. Manual completion can still receive suggestions from a trusted command's `offerSuggestions`; that command must check its own completion permission.
+
+NordCommands does not wrap command implementations or modify Velocity internals.
+
+## Trust boundary
+
+Another trusted plugin at the same final event priority can override the result after this listener. Calls to `executeImmediatelyAsync` or direct command executors can bypass `CommandExecuteEvent`. An event listener cannot isolate installed server plugins from each other.
+
+## Build and tests
+
+Use Maven 3.9+ and JDK 25: `mvn clean verify` or `./build.ps1`. The current output is `target/NordCommands-Velocity-1.1.1.jar`. See [BUILDING.md](BUILDING.md).
+
+The historical security report is `SECURITY-1.1.0.md`; it is excluded from the public repository. Network checks use `test-support/integration.cjs` and isolated fixtures. Probe plugins belong only on those fixtures, never on production.
